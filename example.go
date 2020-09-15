@@ -29,8 +29,8 @@ func TestExample() {
 // AddTraffic ...
 func AddTraffic(eh *EventHandle) {
 	CarOne := new(Car)
-	CarOne.RunBy()
-	CarOne.Park()
+	go CarOne.RunBy()
+	go CarOne.Park()
 }
 
 // ACarDoes ...
