@@ -8,10 +8,6 @@ var (
 	// Traffic ...
 	// an example variable to handle a set of events.
 	Traffic EventHandle
-
-	// ChTraffic ...
-	// go channel which runs Traffic events concurrently
-	ChTraffic chan bool
 )
 
 // TestExample ...
@@ -29,8 +25,20 @@ func TestExample() {
 // AddTraffic ...
 func AddTraffic(eh *EventHandle) {
 	CarOne := new(Car)
-	go CarOne.RunBy()
-	go CarOne.Park()
+
+	// go-routine listeners
+	didCarRunBy := make(chan bool)
+	didCarPark := make(chan bool)
+
+	go CarOne.RunBy(didCarRunBy)
+	go CarOne.Park(didCarPark)
+
+	if <-didCarRunBy {
+		fmt.Println("The car running by was confirmed!")
+	}
+	if <-didCarPark {
+		fmt.Println("The car parking was confirmed!")
+	}
 }
 
 // ACarDoes ...
@@ -44,15 +52,15 @@ type Car struct {
 }
 
 // RunBy ...
-func (c *Car) RunBy() {
+func (c *Car) RunBy(ch chan bool) {
 	// Calls for Traffic event: RunBy
 	// Outputs: A car ran by!
-	Traffic.Call(ChTraffic, "RunBy")
+	Traffic.Call(ch, "RunBy")
 }
 
 // Park ...
-func (c *Car) Park() {
+func (c *Car) Park(ch chan bool) {
 	// Calls for Traffic event: Parked
 	// Output: A car just parked!
-	Traffic.Call(ChTraffic, "Parked")
+	Traffic.Call(ch, "Parked")
 }

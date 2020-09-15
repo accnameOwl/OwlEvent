@@ -26,6 +26,7 @@ func (eh *EventHandle) OnEvent(caller string, a func()) {
 }
 
 // RemoveEventByIndex ...
+// slice -> Delete without preserving order
 func (eh *EventHandle) RemoveEventByIndex(i int) {
 	eh.events = append(eh.events[:i], eh.events[i+1:]...)
 }
@@ -38,7 +39,9 @@ func (eh *EventHandle) Call(ch chan bool, eventID string) {
 			value := eh.events[i]
 			if value.id == eventID {
 				value.function()
+				// slice -> non-preserved order...
 				eh.RemoveEventByIndex(i)
+				// requires index decrementation
 				i--
 			} else {
 				continue
