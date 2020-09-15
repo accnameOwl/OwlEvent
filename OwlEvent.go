@@ -25,8 +25,9 @@ func (eh *EventHandle) OnEvent(caller string, a func()) {
 	eh.events = append(eh.events, *newEvent)
 }
 
-// EndEvent ...
-func (eh *EventHandle) EndEvent(caller string) {
+// RemoveEventByIndex ...
+func (eh *EventHandle) RemoveEventByIndex(i int) {
+	eh.events = append(eh.events[:i], eh.events[i+1:]...)
 }
 
 // Call ...
@@ -36,9 +37,8 @@ func (eh *EventHandle) Call(ch chan bool, eventID string) {
 			fmt.Println("Length of eventHandle.events: ", len(eh.events))
 			value := eh.events[i]
 			if value.id == eventID {
-				// calls it's function.
 				value.function()
-				eh.events = append(eh.events[:i], eh.events[i+1:]...)
+				eh.RemoveEventByIndex(i)
 				i--
 			} else {
 				continue
