@@ -15,8 +15,8 @@ type EventHandler interface {
 	Callback(ev *Event) error
 	RemoveEventByIndex(index int)
 	AppendEvents(move *[]Event, to *[]Event)
-	Push(push *Event, to *[]Event)
-	PopAndGetEvent(index int, el *[]Event) (event Event)
+	Push(push *Event)
+	PopAndGet(index int, el *[]Event) (event Event)
 }
 
 // SafeAsyncEvents ...
@@ -49,7 +49,7 @@ func (sae *SafeAsyncEvents) AppendEvents(move *[]Event) {
 }
 
 // Push ...
-func (sae *SafeAsyncEvents) Push(push *Event, to *[]Event) {
+func (sae *SafeAsyncEvents) Push(push *Event) {
 	sae.mux.Lock()
 	defer sae.mux.Unlock()
 	sae.events = append(sae.events, *push)
