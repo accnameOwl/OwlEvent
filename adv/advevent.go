@@ -1,6 +1,7 @@
 package adv
 
 import (
+	"github.com/accnameowl/owlevent"
 	"sync"
 )
 
@@ -10,28 +11,11 @@ import (
 //		Defer panic and recover, instead of concurrent locking:
 //		-> https://blog.golang.org/defer-panic-and-recover
 
-// EventHandler ...
-type EventHandler interface {
-	Callback(ev *Event) error
-	RemoveEventByIndex(index int)
-	AppendEvents(move *[]Event, to *[]Event)
-	Push(push *Event)
-	PopAndGet(index int, el *[]Event) (event Event)
-}
-
 // SafeAsyncEvents ...
 type SafeAsyncEvents struct {
 	events []Event
 	mux    sync.Mutex
 }
-
-// Event ...
-type Event struct {
-	ID           string
-	ErrorMessage error
-}
-
-// ! Handle Event slices!
 
 // RemoveEventByIndex ...
 // -> RemoveEventByIndex(indexToRemove, &EventList)

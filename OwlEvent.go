@@ -11,9 +11,8 @@ type EventHandle struct {
 
 // Event ...
 type Event struct {
-	id           string
-	errorMessage error
-	function     func()
+	id       string
+	function func()
 }
 
 // OnEvent ...
@@ -31,8 +30,8 @@ func (eh *EventHandle) RemoveEventByIndex(i int) {
 	eh.events = append(eh.events[:i], eh.events[i+1:]...)
 }
 
-// Call ...
-func (eh *EventHandle) Call(ch chan bool, eventID string) {
+// CallEvent ...
+func (eh *EventHandle) CallEvent(ch chan bool, eventID string) {
 	if len(eh.events) > 0 {
 		for i := 0; i < len(eh.events); i++ {
 			fmt.Println("Length of eventHandle.events: ", len(eh.events))
