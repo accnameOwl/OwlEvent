@@ -1,68 +1,50 @@
-package OwlEvent
+package owlevent
 
 import (
 	"fmt"
-	"time"
 )
-
-// SleepTimer ...
-const SleepTimer = 10
 
 // EventHandle ...
 type EventHandle struct {
-	events  []Event
-	Looping bool
-}
-
-// OnEvent ...
-func (eventHandle *EventHandle) OnEvent(caller string, a func() error, b ...) {
-	newEvent := &Event{
-		id:       caller,
-		isAsync:  async,
-		function: a,
-	}
-	switch(b) {
-	case async:
-		newEvent.isAsync = true
-	}
-	eventHandle.events = append(eventHandle.events, *newEvent)
+	events []Event
 }
 
 // Event ...
 type Event struct {
 	id           string
-	isAsync      bool
-	errorMessage string
-	function     func() error
+	errorMessage error
+	function     func()
+}
+
+// OnEvent ...
+func (eh *EventHandle) OnEvent(caller string, a func()) {
+	newEvent := &Event{
+		id:       caller,
+		function: a,
+	}
+	eh.events = append(eh.events, *newEvent)
+}
+
+// EndEvent ...
+func (eh *EventHandle) EndEvent(caller string) {
 }
 
 // Call ...
-func (event *Event) Call(parent *EventHandle) error {
-	e := event.function()
-	return e
-}
-
-// AsyncCall ...
-func (event *Event) AsyncCall(ch chan error) {
-	ch <- event.function()
-	close(ch)
-}
-
-// Start ...
-func (eventHandle *EventHandle) Start() {
-	for eventHandle.Looping {
-		for _, e := range eventHandle.events {
-			switch e.isAsync {
-			case true:
-				ch := make(chan error)
-				go e.AsyncCall(ch)
-				if ch != nil {
-					fmt.Printf("%+v", ch)
-				}
-			case false:
-				e.Call(eventHandle)
+func (eh *EventHandle) Call(ch chan bool, eventID string) {
+	if len(eh.events) > 0 {
+		for i := 0; i < len(eh.events); i++ {
+			fmt.Println("Length of eventHandle.events: ", len(eh.events))
+			value := eh.events[i]
+			if value.id == eventID {
+				// calls it's function.
+				value.function()
+				eh.events = append(eh.events[:i], eh.events[i+1:]...)
+				i--
+			} else {
+				continue
 			}
 		}
-		time.Sleep(time.Second / SleepTimer)
+		ch <- true
 	}
+	close(ch)
 }
